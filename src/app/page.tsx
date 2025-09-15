@@ -6,7 +6,6 @@ import { useGovernanceContract, ProposalStatus } from "@/hooks/contract";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
 import { WalletStatus } from "@/components/wallet/WalletStatus";
 import { QuickTest } from "@/components/testing/QuickTest";
-import { AdminStatus } from "@/components/debug/AdminStatus";
 
 export default function Home() {
   const account = useActiveAccount();
@@ -154,7 +153,6 @@ export default function Home() {
             {/* Testing Section - Development Only */}
             {process.env.NODE_ENV === 'development' && account && (
               <div className="mb-16">
-                <AdminStatus />
                 <QuickTest />
               </div>
             )}

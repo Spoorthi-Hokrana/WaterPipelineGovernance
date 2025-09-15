@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useActiveAccount, useActiveWalletChain } from "thirdweb/react";
 import { useGovernanceContract } from "@/hooks/contract";
 import { getChainInfo } from "@/lib/thirdweb";
-import { useLogger } from "@/utils/debug/logger";
 
 interface TestResult {
   test: string;
@@ -20,17 +19,16 @@ export function QuickTest() {
   const account = useActiveAccount();
   const chain = useActiveWalletChain();
   const { admin, proposalCount, isAdmin } = useGovernanceContract();
-  const log = useLogger("QuickTest");
 
   const addResult = (result: TestResult) => {
     setResults(prev => [...prev, result]);
-    log.info(`Test: ${result.test}`, { status: result.status, message: result.message });
+    console.log(`Test: ${result.test}`, { status: result.status, message: result.message });
   };
 
   const runTests = async () => {
     setIsRunning(true);
     setResults([]);
-    log.info("Starting quick tests");
+    console.log("Starting quick tests");
 
     // Test 1: Wallet Connection
     addResult({
@@ -166,7 +164,7 @@ export function QuickTest() {
     }
 
     setIsRunning(false);
-    log.info("Quick tests completed", { 
+    console.log("Quick tests completed", { 
       totalTests: results.length,
       passed: results.filter(r => r.status === "pass").length
     });

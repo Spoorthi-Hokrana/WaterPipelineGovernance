@@ -5,7 +5,6 @@ import { ThirdwebProvider } from "@/components/providers/ThirdwebProvider";
 import { AppProvider } from "@/context/AppContext";
 import { MainNavigation } from "@/components/navigation/MainNavigation";
 import { NotificationContainer } from "@/components/ui/NotificationContainer";
-import { DebugDashboard, TestRunner } from "@/components/debug/DebugDashboard";
 import { useAppContext } from "@/context/AppContext";
 
 const geistSans = Geist({
@@ -65,8 +64,6 @@ export default function RootLayout({
                 {children}
               </main>
             </div>
-            <DebugDashboard />
-            <TestRunner />
           </NotificationProvider>
         </ThirdwebProvider>
       </body>
