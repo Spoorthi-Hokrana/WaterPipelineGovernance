@@ -9,7 +9,7 @@ interface TestResult {
   test: string;
   status: "pass" | "fail" | "running";
   message: string;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 export function QuickTest() {
@@ -204,7 +204,7 @@ export function QuickTest() {
       <div className="space-y-3">
         {results.length === 0 && !isRunning && (
           <p className="text-gray-600 dark:text-gray-400 text-center py-8">
-            Click "Run Tests" to verify system functionality
+            Click &quot;Run Tests&quot; to verify system functionality
           </p>
         )}
 

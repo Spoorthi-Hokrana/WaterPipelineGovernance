@@ -9,7 +9,7 @@ import { QuickTest } from "@/components/testing/QuickTest";
 
 export default function Home() {
   const account = useActiveAccount();
-  const { proposalCount, getProposal, isAdmin } = useGovernanceContract();
+  const { proposalCount, getProposal } = useGovernanceContract();
 
   // Get some basic stats
   const totalProposals = Number(proposalCount) || 0;

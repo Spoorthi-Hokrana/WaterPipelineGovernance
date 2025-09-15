@@ -4,8 +4,6 @@ import "./globals.css";
 import { ThirdwebProvider } from "@/components/providers/ThirdwebProvider";
 import { AppProvider } from "@/context/AppContext";
 import { MainNavigation } from "@/components/navigation/MainNavigation";
-import { NotificationContainer } from "@/components/ui/NotificationContainer";
-import { useAppContext } from "@/context/AppContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,23 +25,8 @@ function NotificationProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppProvider>
       {children}
-      <GlobalNotifications />
     </AppProvider>
   );
-}
-
-function GlobalNotifications() {
-  try {
-    const { notifications } = useAppContext();
-    return (
-      <NotificationContainer
-        notifications={notifications.notifications}
-        onRemove={notifications.removeNotification}
-      />
-    );
-  } catch {
-    return null;
-  }
 }
 
 export default function RootLayout({
