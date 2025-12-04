@@ -102,32 +102,39 @@ export function MilestoneManagement() {
   };
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        🎯 Milestone Management
-      </h3>
-      <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm">
-        Manage project milestones and fund releases. Anyone can add milestones to passed proposals and mark them complete.
-      </p>
+    <div className="card-premium">
+      <div className="flex items-center gap-3 mb-6 sm:mb-8">
+        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-[#10B981]/10 to-[#059669]/10 dark:from-[#22C55E]/20 dark:to-[#10B981]/20 backdrop-blur-sm">
+          <span className="text-2xl">🎯</span>
+        </div>
+        <div>
+          <h3 className="text-xl sm:text-2xl font-bold text-black dark:text-white tracking-tight">
+            Milestone Management
+          </h3>
+          <p className="text-xs sm:text-sm text-black/60 dark:text-white/60 font-medium">
+            Manage project milestones
+          </p>
+        </div>
+      </div>
 
       {/* Tab Navigation */}
-      <div className="flex mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+      <div className="flex mb-6 bg-black/5 dark:bg-white/5 rounded-xl p-1 gap-1">
         <button
           onClick={() => setActiveTab("add")}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+          className={`flex-1 py-2.5 sm:py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${
             activeTab === "add"
-              ? "bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm"
-              : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+              ? "bg-white dark:bg-[#1A1A1A] text-[#2563EB] dark:text-[#3B82F6] shadow-md"
+              : "text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white"
           }`}
         >
           Add Milestone
         </button>
         <button
           onClick={() => setActiveTab("complete")}
-          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+          className={`flex-1 py-2.5 sm:py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${
             activeTab === "complete"
-              ? "bg-white dark:bg-gray-600 text-green-600 dark:text-green-400 shadow-sm"
-              : "text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400"
+              ? "bg-white dark:bg-[#1A1A1A] text-[#10B981] dark:text-[#22C55E] shadow-md"
+              : "text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white"
           }`}
         >
           Complete Milestone
@@ -136,9 +143,9 @@ export function MilestoneManagement() {
 
       {/* Add Milestone Form */}
       {activeTab === "add" && (
-        <form onSubmit={handleAddSubmit} className="space-y-4">
+        <form onSubmit={handleAddSubmit} className="space-y-5 sm:space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-semibold text-black dark:text-white mb-2 sm:mb-3">
               Proposal ID
             </label>
             <input
@@ -146,52 +153,58 @@ export function MilestoneManagement() {
               placeholder="1"
               value={addForm.proposalId}
               onChange={(e) => setAddForm({ ...addForm, proposalId: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
-                errors.proposalId ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-[#0F0F0F] text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none transition-all duration-200 font-medium ${
+                errors.proposalId 
+                  ? "border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
+                  : "border-black/10 dark:border-white/10 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
               }`}
             />
             {errors.proposalId && (
-              <p className="text-red-500 text-sm mt-1">{errors.proposalId}</p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium animate-slide-in">{errors.proposalId}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-semibold text-black dark:text-white mb-2 sm:mb-3">
               Milestone Description
             </label>
             <textarea
-              rows={3}
+              rows={4}
               placeholder="Describe the milestone..."
               value={addForm.description}
               onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
-                errors.description ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-[#0F0F0F] text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none transition-all duration-200 resize-none ${
+                errors.description 
+                  ? "border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
+                  : "border-black/10 dark:border-white/10 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
               }`}
             />
             {errors.description && (
-              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium animate-slide-in">{errors.description}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-semibold text-black dark:text-white mb-2 sm:mb-3">
               Target Date
             </label>
             <input
               type="date"
               value={addForm.targetDate}
               onChange={(e) => setAddForm({ ...addForm, targetDate: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
-                errors.targetDate ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-[#0F0F0F] text-black dark:text-white focus:outline-none transition-all duration-200 ${
+                errors.targetDate 
+                  ? "border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
+                  : "border-black/10 dark:border-white/10 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
               }`}
             />
             {errors.targetDate && (
-              <p className="text-red-500 text-sm mt-1">{errors.targetDate}</p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium animate-slide-in">{errors.targetDate}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-semibold text-black dark:text-white mb-2 sm:mb-3">
               Release Amount (DEV)
             </label>
             <input
@@ -199,30 +212,41 @@ export function MilestoneManagement() {
               placeholder="1.0"
               value={addForm.releaseAmount}
               onChange={(e) => setAddForm({ ...addForm, releaseAmount: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
-                errors.releaseAmount ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-[#0F0F0F] text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none transition-all duration-200 font-medium ${
+                errors.releaseAmount 
+                  ? "border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
+                  : "border-black/10 dark:border-white/10 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
               }`}
             />
             {errors.releaseAmount && (
-              <p className="text-red-500 text-sm mt-1">{errors.releaseAmount}</p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium animate-slide-in">{errors.releaseAmount}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={isPending}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="w-full btn-premium bg-gradient-to-r from-[#2563EB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#1E3A8A] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:hover:shadow-lg"
           >
-            {isPending ? "Adding..." : "Add Milestone"}
+            <span className="relative z-10">
+              {isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  Adding...
+                </span>
+              ) : (
+                "Add Milestone"
+              )}
+            </span>
           </button>
         </form>
       )}
 
       {/* Complete Milestone Form */}
       {activeTab === "complete" && (
-        <form onSubmit={handleCompleteSubmit} className="space-y-4">
+        <form onSubmit={handleCompleteSubmit} className="space-y-5 sm:space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-semibold text-black dark:text-white mb-2 sm:mb-3">
               Proposal ID
             </label>
             <input
@@ -230,17 +254,19 @@ export function MilestoneManagement() {
               placeholder="1"
               value={completeForm.proposalId}
               onChange={(e) => setCompleteForm({ ...completeForm, proposalId: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white ${
-                errors.proposalId ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-[#0F0F0F] text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none transition-all duration-200 font-medium ${
+                errors.proposalId 
+                  ? "border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
+                  : "border-black/10 dark:border-white/10 focus:border-[#10B981] focus:ring-4 focus:ring-[#10B981]/10"
               }`}
             />
             {errors.proposalId && (
-              <p className="text-red-500 text-sm mt-1">{errors.proposalId}</p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium animate-slide-in">{errors.proposalId}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-semibold text-black dark:text-white mb-2 sm:mb-3">
               Milestone ID
             </label>
             <input
@@ -248,31 +274,46 @@ export function MilestoneManagement() {
               placeholder="1"
               value={completeForm.milestoneId}
               onChange={(e) => setCompleteForm({ ...completeForm, milestoneId: e.target.value })}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-gray-700 dark:text-white ${
-                errors.milestoneId ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-[#0F0F0F] text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none transition-all duration-200 font-medium ${
+                errors.milestoneId 
+                  ? "border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
+                  : "border-black/10 dark:border-white/10 focus:border-[#10B981] focus:ring-4 focus:ring-[#10B981]/10"
               }`}
             />
             {errors.milestoneId && (
-              <p className="text-red-500 text-sm mt-1">{errors.milestoneId}</p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium animate-slide-in">{errors.milestoneId}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={isPending}
-            className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className="w-full btn-premium bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 sm:py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:hover:shadow-lg"
           >
-            {isPending ? "Completing..." : "Complete Milestone"}
+            <span className="relative z-10">
+              {isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                  Completing...
+                </span>
+              ) : (
+                "Complete Milestone"
+              )}
+            </span>
           </button>
         </form>
       )}
 
       {/* Messages */}
       {errors.submit && (
-        <p className="text-red-500 text-sm mt-4">{errors.submit}</p>
+        <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-4 border-2 border-red-500/30 animate-scale-in mt-4">
+          <p className="text-sm text-white font-semibold">{errors.submit}</p>
+        </div>
       )}
       {successMessage && (
-        <p className="text-green-500 text-sm mt-4">{successMessage}</p>
+        <div className="bg-gradient-to-r from-[#10B981] to-[#059669] rounded-xl p-4 border-2 border-[#10B981]/30 animate-scale-in mt-4">
+          <p className="text-sm text-white font-semibold">{successMessage}</p>
+        </div>
       )}
     </div>
   );

@@ -30,17 +30,17 @@ export function ProposalFilters({
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-6">
-      <div className="flex flex-col md:flex-row gap-4">
+    <div className="card-premium p-4 sm:p-6 mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
         {/* Status Filter */}
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-black dark:text-white mb-2">
             Filter by Status
           </label>
           <select
             value={selectedStatus}
             onChange={(e) => onStatusChange(e.target.value === "all" ? "all" : parseInt(e.target.value) as ProposalStatus)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            className="w-full px-4 py-2.5 rounded-xl border-2 border-black/10 dark:border-white/10 bg-white dark:bg-[#0F0F0F] text-black dark:text-white focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10 focus:border-[#2563EB] transition-all duration-200 font-medium"
           >
             {statusOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -52,13 +52,13 @@ export function ProposalFilters({
 
         {/* Sort Options */}
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-semibold text-black dark:text-white mb-2">
             Sort By
           </label>
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as "newest" | "oldest" | "deadline")}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            className="w-full px-4 py-2.5 rounded-xl border-2 border-black/10 dark:border-white/10 bg-white dark:bg-[#0F0F0F] text-black dark:text-white focus:outline-none focus:ring-4 focus:ring-[#2563EB]/10 focus:border-[#2563EB] transition-all duration-200 font-medium"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -66,23 +66,6 @@ export function ProposalFilters({
               </option>
             ))}
           </select>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="flex-1">
-          <div className="text-sm">
-            <p className="font-medium text-gray-700 dark:text-gray-300 mb-2">Quick Stats</p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
-                <p className="text-blue-600 dark:text-blue-400 font-medium">Active</p>
-                <p className="text-blue-800 dark:text-blue-200">0</p>
-              </div>
-              <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded">
-                <p className="text-green-600 dark:text-green-400 font-medium">Passed</p>
-                <p className="text-green-800 dark:text-green-200">0</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

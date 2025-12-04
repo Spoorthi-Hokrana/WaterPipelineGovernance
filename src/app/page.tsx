@@ -2,200 +2,246 @@
 
 import Link from "next/link";
 import { useActiveAccount } from "thirdweb/react";
-import { useGovernanceContract, ProposalStatus } from "@/hooks/contract";
+import { useGovernanceContract } from "@/hooks/contract";
 import { ConnectWallet } from "@/components/wallet/ConnectWallet";
 import { WalletStatus } from "@/components/wallet/WalletStatus";
-import { QuickTest } from "@/components/testing/QuickTest";
 
 export default function Home() {
   const account = useActiveAccount();
-  const { proposalCount, getProposal } = useGovernanceContract();
+  const { proposalCount } = useGovernanceContract();
 
-  // Get some basic stats
   const totalProposals = Number(proposalCount) || 0;
-  const activeProposals = Array.from({ length: totalProposals }, (_, i) => i + 1)
-    .map(id => getProposal(id).proposal)
-    .filter(p => p && p.status === ProposalStatus.Active).length;
-
-  // Everyone has access to governance in this decentralized system
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-16">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <div className="text-6xl mb-6">💧</div>
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            Water Pipeline
-            <span className="text-blue-600 dark:text-blue-400"> Governance</span>
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-            Participate in decentralized governance for water pipeline management. 
-            Vote on proposals, track milestones, and ensure transparent resource allocation.
-          </p>
-          
-          {!account ? (
-            <div className="max-w-md mx-auto">
-              <ConnectWallet className="w-full mb-4" />
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Connect your wallet to get started with governance participation
-              </p>
-            </div>
-          ) : (
-            <WalletStatus />
-          )}
-        </div>
-
-        {/* Quick Stats */}
-        {account && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-              <div className="text-3xl mb-2">📊</div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {totalProposals}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">Total Proposals</p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-              <div className="text-3xl mb-2">🔵</div>
-              <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {activeProposals}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">Active Voting</p>
-            </div>
-            
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-                  <div className="text-3xl mb-2">🏛️</div>
-                  <h3 className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                    Everyone
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">Can Participate</p>
-                </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-              <div className="text-3xl mb-2">🎯</div>
-              <h3 className="text-2xl font-bold text-green-600 dark:text-green-400">
-                Active
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">Platform Status</p>
-            </div>
-          </div>
-        )}
-
-        {/* Main Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <Link
-            href="/proposals"
-            className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow text-center group"
-          >
-            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">📋</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              View Proposals
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Browse all governance proposals and their current status
-            </p>
-            <span className="text-blue-600 dark:text-blue-400 group-hover:underline">
-              Explore →
-            </span>
-          </Link>
-
-          <Link
-            href="/voting"
-            className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow text-center group"
-          >
-            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🗳️</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Cast Votes
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Participate in active voting with your weighted vote
-            </p>
-            <span className="text-blue-600 dark:text-blue-400 group-hover:underline">
-              Vote Now →
-            </span>
-          </Link>
-
-          <Link
-            href="/milestones"
-            className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow text-center group"
-          >
-            <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">🎯</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Track Milestones
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Monitor project progress and milestone completion
-            </p>
-            <span className="text-blue-600 dark:text-blue-400 group-hover:underline">
-              Track →
-            </span>
-          </Link>
-
-              <Link
-                href="/governance"
-                className="bg-purple-100 dark:bg-purple-900/20 border-2 border-purple-300 dark:border-purple-700 rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow text-center group"
-              >
-                <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">⚙️</div>
-                <h3 className="text-xl font-semibold text-purple-900 dark:text-purple-100 mb-2">
-                  Governance
-                </h3>
-                <p className="text-purple-700 dark:text-purple-200 mb-4">
-                  Create proposals, register voters, and manage milestones
-                </p>
-                <span className="text-purple-600 dark:text-purple-400 group-hover:underline">
-                  Participate →
-                </span>
-              </Link>
-        </div>
-
-            {/* Testing Section - Development Only */}
-            {process.env.NODE_ENV === 'development' && account && (
-              <div className="mb-16">
-                <QuickTest />
+    <div className="w-full min-h-screen bg-gradient-to-b from-white via-white to-[#F8F9FA] dark:from-black dark:via-black dark:to-[#0F0F0F]">
+      {/* Hero Section - Fluid Width */}
+      <section className="relative w-full overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-30"></div>
+        
+        <div className="relative w-full hero-section">
+          <div className="w-full hero-content">
+            <div className="text-center w-full">
+              {/* Icon with Scale Animation */}
+              <div className="inline-flex items-center justify-center hero-icon animate-scale-in backdrop-blur-sm">
+                <span className="hero-icon-emoji">💧</span>
               </div>
-            )}
-
-        {/* Features Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-12">
-            Platform Features
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-5xl mb-4">🏛️</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                Decentralized Governance
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Democratic decision-making process with weighted voting based on stakeholder roles
+              
+              {/* Hero Title - Fluid Typography */}
+              <h1 className="hero-title text-black dark:text-white mb-6 sm:mb-8 md:mb-10 tracking-tight leading-[0.9] animate-slide-up">
+                WATER PIPELINE
+                <br />
+                <span className="bg-gradient-to-r from-[#2563EB] via-[#3B82F6] to-[#10B981] bg-clip-text text-transparent animate-fade-in" style={{ animationDelay: '100ms' }}>
+                  GOVERNANCE
+                </span>
+              </h1>
+              
+              {/* Subtitle - Fluid Typography - Centered */}
+              <p className="hero-subtitle text-black/60 dark:text-white/60 mb-8 sm:mb-10 md:mb-12 mx-auto text-center font-medium leading-relaxed animate-fade-in" style={{ animationDelay: '200ms' }}>
+                Decentralized governance platform for transparent water pipeline management. 
+                Vote on proposals, track milestones, ensure accountability.
               </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-5xl mb-4">🔗</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                Blockchain Transparency
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                All votes and decisions recorded immutably on the blockchain for full transparency
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-5xl mb-4">💰</div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                Milestone-Based Funding
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Automatic fund release based on verified milestone completion and progress
-              </p>
+              
+              {/* CTA */}
+              {!account ? (
+                <div className="flex flex-col items-center gap-4 sm:gap-6 animate-fade-in" style={{ animationDelay: '300ms' }}>
+                  <ConnectWallet className="!h-14 sm:!h-16 md:!h-18 !px-10 sm:!px-14 md:!px-18 !text-base sm:!text-lg md:!text-xl font-bold" />
+                  <p className="text-sm sm:text-base md:text-lg text-black/50 dark:text-white/50 font-medium text-center">
+                    Connect your wallet to participate in governance
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full flex justify-center animate-fade-in" style={{ animationDelay: '300ms' }}>
+                  <WalletStatus />
+                </div>
+              )}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Stats Section - Fluid Width */}
+      {account && totalProposals > 0 && (
+        <section className="w-full section-container">
+          <div className="w-full section-content">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 md:gap-8 lg:gap-10">
+              <div className="group card-premium animate-slide-up hover:scale-105 transition-transform duration-300" style={{ animationDelay: '100ms' }}>
+                <div className="stats-icon mb-4 sm:mb-5 transition-transform duration-200 group-hover:scale-110">📊</div>
+                <div className="stats-number text-black dark:text-white mb-2 sm:mb-3 tracking-tight">
+                  {totalProposals}
+                </div>
+                <div className="stats-label text-black/60 dark:text-white/60 font-semibold">Total Proposals</div>
+              </div>
+              
+              <div className="group card-premium bg-gradient-to-br from-[#2563EB] to-[#1E40AF] border-[#2563EB]/30 animate-slide-up hover:scale-105 transition-transform duration-300" style={{ animationDelay: '200ms' }}>
+                <div className="stats-icon mb-4 sm:mb-5 transition-transform duration-200 group-hover:scale-110">🗳️</div>
+                <div className="stats-number text-white mb-2 sm:mb-3 tracking-tight">
+                  Live
+                </div>
+                <div className="stats-label text-white/90 font-semibold">Voting Open</div>
+              </div>
+              
+              <div className="group card-premium bg-gradient-to-br from-[#10B981] to-[#059669] border-[#10B981]/30 animate-slide-up hover:scale-105 transition-transform duration-300" style={{ animationDelay: '300ms' }}>
+                <div className="stats-icon mb-4 sm:mb-5 transition-transform duration-200 group-hover:scale-110">🏛️</div>
+                <div className="stats-number text-white mb-2 sm:mb-3 tracking-tight">
+                  Open
+                </div>
+                <div className="stats-label text-white/90 font-semibold">Governance</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Section Divider */}
+      <div className="w-full section-divider-container">
+        <div className="w-full">
+          <div className="h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent"></div>
         </div>
       </div>
+
+      {/* Feature Cards - Fluid Width Grid */}
+      <section className="w-full section-container">
+        <div className="w-full section-content">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12">
+            <Link
+              href="/proposals"
+              className="group card-premium hover:border-[#2563EB]/30 dark:hover:border-[#3B82F6]/30 animate-slide-up hover:scale-[1.02] transition-all duration-300"
+              style={{ animationDelay: '100ms' }}
+            >
+              <div className="inline-flex items-center justify-center feature-icon rounded-2xl bg-gradient-to-br from-[#2563EB]/10 to-[#1E40AF]/10 dark:from-[#3B82F6]/20 dark:to-[#2563EB]/20 mb-5 sm:mb-6 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <span className="feature-icon-emoji">📋</span>
+              </div>
+              <h3 className="feature-title text-black dark:text-white mb-3 sm:mb-4 tracking-tight">
+                View Proposals
+              </h3>
+              <p className="feature-description text-black/60 dark:text-white/60 mb-5 sm:mb-6 font-medium leading-relaxed">
+                Browse all governance proposals and track their current status
+              </p>
+              <div className="text-[#2563EB] dark:text-[#3B82F6] font-semibold feature-link group-hover:translate-x-2 transition-transform duration-300 inline-flex items-center gap-2">
+                Explore <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </div>
+            </Link>
+
+            <Link
+              href="/voting"
+              className="group card-premium bg-gradient-to-br from-[#2563EB] to-[#1E40AF] border-[#2563EB]/30 hover:shadow-2xl animate-slide-up hover:scale-[1.02] transition-all duration-300"
+              style={{ animationDelay: '200ms' }}
+            >
+              <div className="inline-flex items-center justify-center feature-icon rounded-2xl bg-white/20 backdrop-blur-sm mb-5 sm:mb-6 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <span className="feature-icon-emoji">🗳️</span>
+              </div>
+              <h3 className="feature-title text-white mb-3 sm:mb-4 tracking-tight">
+                Cast Votes
+              </h3>
+              <p className="feature-description text-white/90 mb-5 sm:mb-6 font-medium leading-relaxed">
+                Participate in active voting with your weighted voting power
+              </p>
+              <div className="text-white font-semibold feature-link group-hover:translate-x-2 transition-transform duration-300 inline-flex items-center gap-2">
+                Vote Now <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </div>
+            </Link>
+
+            <Link
+              href="/milestones"
+              className="group card-premium hover:border-[#10B981]/30 dark:hover:border-[#22C55E]/30 animate-slide-up hover:scale-[1.02] transition-all duration-300"
+              style={{ animationDelay: '300ms' }}
+            >
+              <div className="inline-flex items-center justify-center feature-icon rounded-2xl bg-gradient-to-br from-[#10B981]/20 to-[#059669]/20 dark:from-[#22C55E]/20 dark:to-[#10B981]/20 mb-5 sm:mb-6 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <span className="feature-icon-emoji">🎯</span>
+              </div>
+              <h3 className="feature-title text-black dark:text-white mb-3 sm:mb-4 tracking-tight">
+                Track Milestones
+              </h3>
+              <p className="feature-description text-black/60 dark:text-white/60 mb-5 sm:mb-6 font-medium leading-relaxed">
+                Monitor project progress and milestone completion in real-time
+              </p>
+              <div className="text-[#10B981] dark:text-[#22C55E] font-semibold feature-link group-hover:translate-x-2 transition-transform duration-300 inline-flex items-center gap-2">
+                Track <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </div>
+            </Link>
+
+            <Link
+              href="/governance"
+              className="group card-premium bg-gradient-to-br from-[#D946A6] to-[#C026A3] border-[#D946A6]/30 hover:shadow-2xl animate-slide-up hover:scale-[1.02] transition-all duration-300"
+              style={{ animationDelay: '400ms' }}
+            >
+              <div className="inline-flex items-center justify-center feature-icon rounded-2xl bg-white/20 backdrop-blur-sm mb-5 sm:mb-6 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <span className="feature-icon-emoji">⚙️</span>
+              </div>
+              <h3 className="feature-title text-white mb-3 sm:mb-4 tracking-tight">
+                Governance
+              </h3>
+              <p className="feature-description text-white/90 mb-5 sm:mb-6 font-medium leading-relaxed">
+                Create proposals, register voters, and manage the system
+              </p>
+              <div className="text-white font-semibold feature-link group-hover:translate-x-2 transition-transform duration-300 inline-flex items-center gap-2">
+                Participate <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Divider */}
+      <div className="w-full section-divider-container">
+        <div className="w-full">
+          <div className="h-px bg-gradient-to-r from-transparent via-black/10 dark:via-white/10 to-transparent"></div>
+        </div>
+      </div>
+
+      {/* Platform Features Section - Fluid Width */}
+      <section className="w-full section-container">
+        <div className="w-full section-content">
+          <div className="card-premium features-card bg-gradient-to-br from-white/50 to-[#F8F9FA]/50 dark:from-[#1A1A1A]/50 dark:to-[#0F0F0F]/50 backdrop-blur-xl">
+            <div className="text-center mb-12 sm:mb-14 md:mb-16 lg:mb-20">
+              <h2 className="features-title text-black dark:text-white mb-4 sm:mb-5 md:mb-6 tracking-tight">
+                Platform Features
+              </h2>
+              <p className="features-subtitle text-black/60 dark:text-white/60 mx-auto font-medium leading-relaxed">
+                Everything you need for transparent, decentralized governance
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 md:gap-12 lg:gap-14">
+              <div className="text-center animate-fade-in" style={{ animationDelay: '100ms' }}>
+                <div className="inline-flex items-center justify-center feature-icon-lg rounded-3xl bg-gradient-to-br from-[#2563EB]/10 to-[#1E40AF]/10 dark:from-[#3B82F6]/20 dark:to-[#2563EB]/20 mb-5 sm:mb-6 backdrop-blur-sm">
+                  <span className="feature-icon-lg-emoji">🏛️</span>
+                </div>
+                <h3 className="feature-item-title text-black dark:text-white mb-3 sm:mb-4 tracking-tight">
+                  Decentralized
+                </h3>
+                <p className="feature-item-description text-black/60 dark:text-white/60 font-medium leading-relaxed mx-auto">
+                  Democratic decision-making with weighted voting based on stakeholder roles and responsibilities
+                </p>
+              </div>
+              
+              <div className="text-center animate-fade-in" style={{ animationDelay: '200ms' }}>
+                <div className="inline-flex items-center justify-center feature-icon-lg rounded-3xl bg-gradient-to-br from-[#10B981]/20 to-[#059669]/20 dark:from-[#22C55E]/20 dark:to-[#10B981]/20 mb-5 sm:mb-6 backdrop-blur-sm">
+                  <span className="feature-icon-lg-emoji">🔗</span>
+                </div>
+                <h3 className="feature-item-title text-black dark:text-white mb-3 sm:mb-4 tracking-tight">
+                  Transparent
+                </h3>
+                <p className="feature-item-description text-black/60 dark:text-white/60 font-medium leading-relaxed mx-auto">
+                  All votes and decisions recorded immutably on blockchain for complete transparency and auditability
+                </p>
+              </div>
+              
+              <div className="text-center animate-fade-in md:col-span-2 lg:col-span-1" style={{ animationDelay: '300ms' }}>
+                <div className="inline-flex items-center justify-center feature-icon-lg rounded-3xl bg-gradient-to-br from-[#D946A6]/10 to-[#C026A3]/10 dark:from-[#EC4899]/20 dark:to-[#D946A6]/20 mb-5 sm:mb-6 backdrop-blur-sm">
+                  <span className="feature-icon-lg-emoji">💰</span>
+                </div>
+                <h3 className="feature-item-title text-black dark:text-white mb-3 sm:mb-4 tracking-tight">
+                  Accountable
+                </h3>
+                <p className="feature-item-description text-black/60 dark:text-white/60 font-medium leading-relaxed mx-auto">
+                  Milestone-based funding with verified completion tracking and automatic fund release
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

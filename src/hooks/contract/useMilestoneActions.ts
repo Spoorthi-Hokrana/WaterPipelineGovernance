@@ -19,7 +19,7 @@ export function useMilestoneActions() {
     proposalId: number,
     description: string,
     targetDate: Date,
-    releaseAmount: string // Amount in ETH as string
+    releaseAmount: string // Amount in DEV as string (Moonbase Alpha native currency)
   ) => {
     if (!account) {
       throw new Error("No active account");
@@ -28,7 +28,7 @@ export function useMilestoneActions() {
     // Convert date to timestamp
     const targetTimestamp = BigInt(Math.floor(targetDate.getTime() / 1000));
     
-    // Convert ETH to Wei
+    // Convert DEV to Wei (smallest unit)
     const releaseAmountInWei = BigInt(Math.floor(parseFloat(releaseAmount) * 1e18));
 
     const transaction = prepareContractCall({

@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect, useMemo, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { useGovernanceContract, ProposalStatus } from "@/hooks/contract";
-import { VotingCard } from "@/components/voting/VotingCard";
-import { ProposalCard } from "@/components/proposals/ProposalCard";
+import { useGovernanceContract } from "@/hooks/contract";
+import { VotingCardWrapper } from "@/components/voting/VotingCardWrapper";
+import { ProposalItem } from "@/components/proposals/ProposalItem";
+import Link from "next/link";
 
 function VotingPageContent() {
   const searchParams = useSearchParams();
-  const { proposalCount, getProposal } = useGovernanceContract();
+  const { proposalCount } = useGovernanceContract();
   const [selectedProposalId, setSelectedProposalId] = useState<number | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   // Get proposal ID from URL params
   useEffect(() => {
@@ -23,224 +23,108 @@ function VotingPageContent() {
     }
   }, [searchParams]);
 
-  // Generate array of proposal IDs for active proposals
-  const activeProposalIds = useMemo(() => {
-    const count = Number(proposalCount) || 0;
-    const ids = [];
-    
-    for (let i = 1; i <= count; i++) {
-      const { proposal } = getProposal(i);
-      if (proposal && proposal.status === ProposalStatus.Active) {
-        ids.push(i);
-      }
-    }
-    
-    return ids;
-  }, [proposalCount, getProposal, refreshKey]);
-
-  const selectedProposal = selectedProposalId ? getProposal(selectedProposalId).proposal : null;
-
-  const handleVoteSuccess = () => {
-    // Refresh the data after a successful vote
-    setRefreshKey(prev => prev + 1);
-  };
+  // Generate array of proposal IDs
+  const proposalIds = Array.from({ length: Number(proposalCount) || 0 }, (_, i) => i + 1);
 
   if (!proposalCount || Number(proposalCount) === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🗳️</div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            No Proposals to Vote On
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            There are currently no proposals available for voting.
-          </p>
-          <button
-            onClick={() => window.location.href = '/proposals'}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
-          >
-            View All Proposals
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (activeProposalIds.length === 0) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <div className="text-6xl mb-4">⏰</div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            No Active Voting
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            There are currently no active proposals available for voting.
-          </p>
-          <button
-            onClick={() => window.location.href = '/proposals'}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors mr-4"
-          >
-            View All Proposals
-          </button>
-          <button
-            onClick={() => window.location.href = '/'}
-            className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors"
-          >
-            Back to Home
-          </button>
-        </div>
+      <div className="w-full min-h-screen bg-gradient-to-b from-white via-white to-[#F8F9FA] dark:from-black dark:via-black dark:to-[#0F0F0F]">
+        <section className="relative w-full overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-30"></div>
+          <div className="relative w-full hero-section">
+            <div className="w-full hero-content">
+              <div className="text-center w-full">
+                <div className="inline-flex items-center justify-center hero-icon animate-scale-in backdrop-blur-sm">
+                  <span className="hero-icon-emoji">🗳️</span>
+                </div>
+                <h1 className="hero-title text-black dark:text-white mb-6 sm:mb-8 md:mb-10 tracking-tight animate-slide-up">
+                  No Proposals to Vote On
+                </h1>
+                <p className="hero-subtitle text-black/60 dark:text-white/60 mb-8 sm:mb-10 md:mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                  There are currently no proposals available for voting.
+                </p>
+                <Link
+                  href="/proposals"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#2563EB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#1E3A8A] text-white font-bold py-3 sm:py-4 md:py-5 px-8 sm:px-10 md:px-12 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-base sm:text-lg md:text-xl animate-fade-in"
+                  style={{ animationDelay: '300ms' }}
+                >
+                  View All Proposals →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          🗳️ Voting Interface
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Cast your weighted vote on active governance proposals.
-        </p>
-      </div>
+    <div className="w-full min-h-screen bg-gradient-to-b from-white via-white to-[#F8F9FA] dark:from-black dark:via-black dark:to-[#0F0F0F]">
+      {/* Hero Section - Fluid Width */}
+      <section className="relative w-full overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-30"></div>
+        
+        <div className="relative w-full hero-section">
+          <div className="w-full hero-content">
+            <div className="text-center w-full">
+              <div className="inline-flex items-center justify-center hero-icon animate-scale-in backdrop-blur-sm">
+                <span className="hero-icon-emoji">🗳️</span>
+              </div>
+              <h1 className="hero-title text-black dark:text-white mb-6 sm:mb-8 md:mb-10 tracking-tight animate-slide-up">
+                Voting Interface
+              </h1>
+              <p className="hero-subtitle text-black/60 dark:text-white/60 mb-8 sm:mb-10 md:mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                Cast your weighted vote on active governance proposals.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Main Voting Area */}
-        <div className="xl:col-span-2">
-          {selectedProposal ? (
-            <div>
-              <div className="mb-4">
+      {selectedProposalId ? (
+        <section className="w-full section-container">
+          <div className="w-full section-content">
+            <div className="w-full" style={{ maxWidth: 'min(95%, 1200px)' }}>
+              <div className="text-center mb-6 sm:mb-8">
                 <button
                   onClick={() => setSelectedProposalId(null)}
-                  className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                  className="text-[#2563EB] dark:text-[#3B82F6] hover:underline font-bold text-base sm:text-lg transition-colors"
                 >
                   ← Back to proposal list
                 </button>
               </div>
-              <VotingCard 
-                proposal={selectedProposal} 
-                onVoteSuccess={handleVoteSuccess}
+              <VotingCardWrapper 
+                proposalId={selectedProposalId}
+                onVoteSuccess={() => setSelectedProposalId(null)}
               />
             </div>
-          ) : (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Select a Proposal to Vote On
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Choose from the active proposals below to cast your vote.
-              </p>
-              
-              <div className="space-y-4">
-                {activeProposalIds.map(id => {
-                  const { proposal } = getProposal(id);
-                  if (!proposal) return null;
-                  
-                  return (
-                    <div 
-                      key={id}
-                      className="cursor-pointer hover:shadow-lg transition-shadow"
-                      onClick={() => setSelectedProposalId(id)}
-                    >
-                      <ProposalCard 
-                        proposal={proposal} 
-                        showVoteButton={false}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Active Proposals Quick List */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Active Proposals
-            </h3>
-            <div className="space-y-3">
-              {activeProposalIds.map(id => {
-                const { proposal } = getProposal(id);
-                if (!proposal) return null;
-                
-                return (
-                  <button
-                    key={id}
-                    onClick={() => setSelectedProposalId(id)}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                      selectedProposalId === id
-                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                        : "border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    }`}
-                  >
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      Proposal #{id}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                      {proposal.description.length > 50 
-                        ? proposal.description.substring(0, 50) + "..."
-                        : proposal.description
-                      }
-                    </div>
-                  </button>
-                );
-              })}
+          </div>
+        </section>
+      ) : (
+        <section className="w-full section-container">
+          <div className="w-full section-content">
+            <h2 className="feature-title text-black dark:text-white mb-8 sm:mb-10 md:mb-12 text-center animate-fade-in">
+              Select a Proposal to Vote On
+            </h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12">
+              {proposalIds.map((id, index) => (
+                <div 
+                  key={id}
+                  className="animate-fade-in cursor-pointer" 
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                  onClick={() => setSelectedProposalId(id)}
+                >
+                  <ProposalItem 
+                    proposalId={id}
+                    showVoteButton={false}
+                  />
+                </div>
+              ))}
             </div>
           </div>
-
-          {/* Voting Guidelines */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">
-              Voting Guidelines
-            </h3>
-            <div className="space-y-3 text-sm text-blue-800 dark:text-blue-200">
-              <div className="flex items-start">
-                <span className="text-blue-600 dark:text-blue-400 mr-2">•</span>
-                <span>Each voter has different voting weights based on their role</span>
-              </div>
-              <div className="flex items-start">
-                <span className="text-blue-600 dark:text-blue-400 mr-2">•</span>
-                <span>You can only vote once per proposal</span>
-              </div>
-              <div className="flex items-start">
-                <span className="text-blue-600 dark:text-blue-400 mr-2">•</span>
-                <span>Voting periods last for 7 days from proposal creation</span>
-              </div>
-              <div className="flex items-start">
-                <span className="text-blue-600 dark:text-blue-400 mr-2">•</span>
-                <span>Your vote is recorded permanently on the blockchain</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Voting Stats */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Voting Statistics
-            </h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-400">Active Proposals:</span>
-                <span className="font-medium text-gray-900 dark:text-white">
-                  {activeProposalIds.length}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-400">Total Proposals:</span>
-                <span className="font-medium text-gray-900 dark:text-white">
-                  {Number(proposalCount)}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -248,10 +132,10 @@ function VotingPageContent() {
 export default function VotingPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading voting interface...</p>
+      <div className="w-full min-h-screen bg-gradient-to-b from-white via-white to-[#F8F9FA] dark:from-black dark:via-black dark:to-[#0F0F0F] flex items-center justify-center">
+        <div className="text-center px-4">
+          <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-[#2563EB] mx-auto mb-4"></div>
+          <p className="text-sm sm:text-base text-black/60 dark:text-white/60 font-medium">Loading voting interface...</p>
         </div>
       </div>
     }>

@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useProposalActions } from "@/hooks/contract";
 import { validateEthereumAddress, validateProposalDescription, validateEthAmount } from "@/utils/contractUtils";
+import { useActiveAccount } from "thirdweb/react";
 
 export function ProposalCreation() {
   const { createProposal, isPending } = useProposalActions();
+  const account = useActiveAccount();
   const [formData, setFormData] = useState({
     description: "",
     contractorAddress: "",
@@ -22,8 +24,11 @@ export function ProposalCreation() {
       newErrors.description = descValidation.error || "Invalid description";
     }
 
-    if (!validateEthereumAddress(formData.contractorAddress)) {
-      newErrors.contractorAddress = "Invalid contractor address";
+    const trimmedAddress = formData.contractorAddress.trim();
+    if (!trimmedAddress) {
+      newErrors.contractorAddress = "Contractor address is required";
+    } else if (!validateEthereumAddress(trimmedAddress)) {
+      newErrors.contractorAddress = "Invalid wallet address format";
     }
 
     const amountValidation = validateEthAmount(formData.fundsAmount);
@@ -38,84 +43,119 @@ export function ProposalCreation() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccessMessage("");
+    setErrors({});
 
     if (!validateForm()) return;
-
+    
     try {
-      await createProposal(
+      const trimmedAddress = formData.contractorAddress.trim();
+      const result = await createProposal(
         formData.description,
-        formData.contractorAddress,
+        trimmedAddress,
         formData.fundsAmount
       );
       
-      setSuccessMessage("Proposal created successfully!");
+      const txHash = result?.transactionHash || result?.hash || result?.receipt?.transactionHash || (typeof result === 'string' ? result : null);
+      
+      if (txHash) {
+        const blockExplorerUrl = `https://moonbase.moonscan.io/tx/${txHash}`;
+        setSuccessMessage(`PROPOSAL_CREATED_SUCCESS|${txHash}|${blockExplorerUrl}`);
+      } else {
+        setSuccessMessage("PROPOSAL_CREATED_SUCCESS|NO_HASH");
+      }
       setFormData({ description: "", contractorAddress: "", fundsAmount: "" });
       setErrors({});
-    } catch (error) {
-      console.error("Failed to create proposal:", error);
-      setErrors({ submit: "Failed to create proposal. Please try again." });
+    } catch (error: any) {
+      const errorStr = JSON.stringify(error || "").toLowerCase();
+      const isHarmlessError = errorStr.includes("thirdweb.com/event") || 
+                              errorStr.includes("social.thirdweb.com") ||
+                              (errorStr.includes("401") && errorStr.includes("thirdweb"));
+      
+      if (!isHarmlessError) {
+        console.error("Failed to create proposal:", error);
+      }
+      
+      let errorMessage = error?.decodedReason || error?.userFriendlyMessage || error?.message || "Failed to create proposal. Please try again.";
+      setErrors({ submit: errorMessage });
     }
   };
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        📋 Create New Proposal
-      </h3>
-      <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm">
-        Anyone can create proposals for community consideration. Describe the work needed and funding requirements.
-      </p>
+    <div className="card-premium p-8">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2563EB]/10 to-[#1E40AF]/10 dark:from-[#3B82F6]/20 dark:to-[#2563EB]/20 backdrop-blur-sm">
+          <span className="text-2xl">📝</span>
+        </div>
+        <div>
+          <h3 className="text-2xl font-bold text-black dark:text-white tracking-tight">
+            Create Proposal
+          </h3>
+          <p className="text-sm text-black/60 dark:text-white/60 font-medium">
+            Submit a new governance proposal
+          </p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Proposal Description
+          <label className="block text-sm font-semibold text-black dark:text-white mb-3">
+            Description
           </label>
           <textarea
-            rows={4}
+            rows={5}
             placeholder="Describe the maintenance or repair work needed..."
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white resize-vertical ${
-              errors.description ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+            className={`w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-[#0F0F0F] text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none transition-all duration-200 font-medium resize-vertical ${
+              errors.description 
+                ? "border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
+                : "border-black/10 dark:border-white/10 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
             }`}
           />
-          <div className="flex justify-between items-center mt-1">
-            {errors.description && (
-              <p className="text-red-500 text-sm">{errors.description}</p>
-            )}
-            <p className="text-gray-500 text-sm ml-auto">
-              {formData.description.length}/500
-            </p>
-          </div>
+          {errors.description && (
+            <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium animate-slide-in">{errors.description}</p>
+          )}
+          <p className="text-xs text-black/50 dark:text-white/50 mt-2 font-medium">
+            {formData.description.length}/500 characters
+          </p>
         </div>
 
         {/* Contractor Address */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-semibold text-black dark:text-white mb-3">
             Contractor Address
           </label>
-          <input
-            type="text"
-            placeholder="0x1234567890123456789012345678901234567890"
-            value={formData.contractorAddress}
-            onChange={(e) => setFormData({ ...formData, contractorAddress: e.target.value })}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
-              errors.contractorAddress ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-            }`}
-          />
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="0x..."
+              value={formData.contractorAddress}
+              onChange={(e) => setFormData({ ...formData, contractorAddress: e.target.value })}
+              className={`w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-[#0F0F0F] text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none transition-all duration-200 font-mono text-sm ${
+                errors.contractorAddress 
+                  ? "border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
+                  : "border-black/10 dark:border-white/10 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
+              }`}
+            />
+          </div>
           {errors.contractorAddress && (
-            <p className="text-red-500 text-sm mt-1">{errors.contractorAddress}</p>
+            <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium animate-slide-in">{errors.contractorAddress}</p>
           )}
-          <p className="text-gray-500 text-sm mt-1">
-            Address of the contractor or organization responsible for the work
-          </p>
+          {account && (
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, contractorAddress: account.address })}
+              className="mt-2 text-xs text-[#2563EB] dark:text-[#3B82F6] hover:underline font-semibold transition-colors"
+            >
+              Use my wallet address →
+            </button>
+          )}
         </div>
 
         {/* Funds Amount */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-semibold text-black dark:text-white mb-3">
             Escrowed Funds (DEV)
           </label>
           <input
@@ -123,33 +163,74 @@ export function ProposalCreation() {
             placeholder="5.0"
             value={formData.fundsAmount}
             onChange={(e) => setFormData({ ...formData, fundsAmount: e.target.value })}
-            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white ${
-              errors.fundsAmount ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+            className={`w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-[#0F0F0F] text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none transition-all duration-200 font-medium ${
+              errors.fundsAmount 
+                ? "border-red-500/50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10" 
+                : "border-black/10 dark:border-white/10 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
             }`}
           />
           {errors.fundsAmount && (
-            <p className="text-red-500 text-sm mt-1">{errors.fundsAmount}</p>
+            <p className="text-sm text-red-600 dark:text-red-400 mt-2 font-medium animate-slide-in">{errors.fundsAmount}</p>
           )}
-          <p className="text-gray-500 text-sm mt-1">
-            Total amount to be escrowed for this proposal (on Moonbase Alpha)
-          </p>
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
           disabled={isPending}
-          className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-md transition-colors"
+          className="w-full btn-premium bg-gradient-to-r from-[#2563EB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#1E3A8A] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:hover:shadow-lg"
         >
-          {isPending ? "Creating..." : "Create Proposal"}
+          <span className="relative z-10">
+            {isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                Creating...
+              </span>
+            ) : (
+              "Create Proposal"
+            )}
+          </span>
         </button>
 
-        {/* Messages */}
-        {errors.submit && (
-          <p className="text-red-500 text-sm">{errors.submit}</p>
-        )}
+        {/* Success Message */}
         {successMessage && (
-          <p className="text-green-500 text-sm">{successMessage}</p>
+          <div className="bg-gradient-to-r from-[#10B981] to-[#059669] rounded-xl p-6 border-2 border-[#10B981]/30 animate-scale-in backdrop-blur-sm">
+            <div className="flex items-start gap-4">
+              <span className="text-3xl">✅</span>
+              <div className="flex-1">
+                <p className="text-lg font-bold text-white mb-2">
+                  Proposal Created!
+                </p>
+                {successMessage.includes("|") && !successMessage.includes("NO_HASH") && (
+                  <a
+                    href={successMessage.split("|")[2]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    View on Moonscan →
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {errors.submit && (
+          <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-6 border-2 border-red-500/30 animate-scale-in backdrop-blur-sm">
+            <div className="flex items-start gap-4">
+              <span className="text-3xl">❌</span>
+              <div className="flex-1">
+                <p className="text-lg font-bold text-white mb-2">
+                  Error
+                </p>
+                <p className="text-sm text-white/90 whitespace-pre-line font-medium">
+                  {errors.submit}
+                </p>
+              </div>
+            </div>
+          </div>
         )}
       </form>
     </div>

@@ -14,7 +14,8 @@ export function formatAddress(address: string): string {
 }
 
 /**
- * Validate if a string is a valid Ethereum address
+ * Validate if a string is a valid wallet address (EVM-compatible)
+ * Works for all EVM chains including Moonbase Alpha
  */
 export function isValidAddress(address: string): boolean {
   try {
@@ -62,6 +63,8 @@ export function getNetworkName(chainId: number): string {
     11155111: "Sepolia Testnet",
     137: "Polygon Mainnet",
     80001: "Polygon Mumbai Testnet",
+    1287: "Moonbase Alpha", // Moonbeam Testnet
+    1284: "Moonbeam Mainnet",
   };
   
   return networks[chainId] || `Unknown Network (${chainId})`;

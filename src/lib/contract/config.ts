@@ -5,6 +5,11 @@ import { WATER_PIPELINE_GOVERNANCE_ABI } from "./abi";
 // Contract address - Update this with your deployed contract address
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000";
 
+// Log contract address on initialization (server-side only)
+if (typeof window === 'undefined' && CONTRACT_ADDRESS !== "0x0000000000000000000000000000000000000000") {
+  console.log("📋 Contract Address from ENV:", CONTRACT_ADDRESS);
+}
+
 // Contract instance
 export const waterPipelineContract = getContract({
   client,

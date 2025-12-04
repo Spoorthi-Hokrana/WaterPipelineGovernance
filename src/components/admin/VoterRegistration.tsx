@@ -18,7 +18,7 @@ export function VoterRegistration() {
     const newErrors: Record<string, string> = {};
 
     if (!validateEthereumAddress(formData.address)) {
-      newErrors.address = "Invalid Ethereum address";
+      newErrors.address = "Invalid wallet address. Must start with 0x and have 42 characters";
     }
 
     const weightValidation = validateVoterWeight(parseInt(formData.weight));
@@ -46,9 +46,33 @@ export function VoterRegistration() {
       setSuccessMessage("Voter registered successfully!");
       setFormData({ address: "", type: VoterType.Citizen, weight: "1" });
       setErrors({});
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to register voter:", error);
-      setErrors({ submit: "Failed to register voter. Please try again." });
+      
+      // Extract more detailed error message
+      let errorMessage = "Failed to register voter. Please try again.";
+      
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (error?.reason) {
+        errorMessage = error.reason;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      }
+      
+      // Check for common errors
+      const errorStr = JSON.stringify(error || "").toLowerCase();
+      if (errorStr.includes("already registered") || errorMessage.toLowerCase().includes("already")) {
+        errorMessage = "✅ This voter is already registered. You can check their status or register a different address.";
+      } else if (errorStr.includes("admin only") || errorMessage.toLowerCase().includes("admin")) {
+        errorMessage = "❌ Only the contract admin can register voters. Make sure you're using the admin wallet.";
+      } else if (errorStr.includes("invalid voter") || errorMessage.toLowerCase().includes("invalid")) {
+        errorMessage = "❌ Invalid voter address or voter type. Please check your input.";
+      } else if (errorStr.includes("user rejected") || errorStr.includes("denied")) {
+        errorMessage = "⚠️ Transaction was rejected in MetaMask. Please try again and confirm the transaction.";
+      }
+      
+      setErrors({ submit: errorMessage });
     }
   };
 

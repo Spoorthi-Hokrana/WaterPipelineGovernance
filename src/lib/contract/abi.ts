@@ -1,6 +1,6 @@
 /**
  * WaterPipelineGovernance Contract ABI
- * Generated from the Solidity contract
+ * Generated from the deployed Solidity contract
  */
 
 export const WATER_PIPELINE_GOVERNANCE_ABI = [

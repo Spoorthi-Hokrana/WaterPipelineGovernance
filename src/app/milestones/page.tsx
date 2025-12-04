@@ -1,319 +1,119 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useGovernanceContract, ProposalStatus, getProposalStatusText } from "@/hooks/contract";
+import { useState } from "react";
+import { useGovernanceContract } from "@/hooks/contract";
 import { MilestoneManager } from "@/components/milestones/MilestoneManager";
-import { weiToEth, formatTimestamp } from "@/utils/contractUtils";
+import { ProposalItem } from "@/components/proposals/ProposalItem";
+import Link from "next/link";
 
 export default function MilestonesPage() {
-  const { proposalCount, getProposal } = useGovernanceContract();
+  const { proposalCount } = useGovernanceContract();
   const [selectedProposalId, setSelectedProposalId] = useState<number | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Get all passed proposals that can have milestones
-  const passedProposals = useMemo(() => {
-    const count = Number(proposalCount) || 0;
-    const proposals = [];
-    
-    for (let i = 1; i <= count; i++) {
-      const { proposal } = getProposal(i);
-      if (proposal && proposal.status === ProposalStatus.Passed) {
-        proposals.push(proposal);
-      }
-    }
-    
-    return proposals;
-  }, [proposalCount, getProposal, refreshKey]);
-
-  const selectedProposal = selectedProposalId ? getProposal(selectedProposalId).proposal : null;
-
-  const handleMilestoneUpdate = () => {
-    setRefreshKey(prev => prev + 1);
-  };
+  const proposalIds = Array.from({ length: Number(proposalCount) || 0 }, (_, i) => i + 1);
 
   if (!proposalCount || Number(proposalCount) === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🎯</div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            No Proposals Available
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            There are no proposals in the system yet. Milestones can only be added to passed proposals.
-          </p>
-          <button
-            onClick={() => window.location.href = '/proposals'}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
-          >
-            View Proposals
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (passedProposals.length === 0) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🏗️</div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            No Passed Proposals
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            There are currently no passed proposals that can have milestones. 
-            Milestones can only be added to proposals that have been approved through voting.
-          </p>
-          <div className="space-x-4">
-            <button
-              onClick={() => window.location.href = '/proposals'}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
-            >
-              View All Proposals
-            </button>
-            <button
-              onClick={() => window.location.href = '/voting'}
-              className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-6 py-3 rounded-lg transition-colors"
-            >
-              Vote on Active Proposals
-            </button>
+      <div className="w-full min-h-screen bg-gradient-to-b from-white via-white to-[#F8F9FA] dark:from-black dark:via-black dark:to-[#0F0F0F]">
+        <section className="relative w-full overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-30"></div>
+          <div className="relative w-full hero-section">
+            <div className="w-full hero-content">
+              <div className="text-center w-full">
+                <div className="inline-flex items-center justify-center hero-icon animate-scale-in backdrop-blur-sm">
+                  <span className="hero-icon-emoji">🎯</span>
+                </div>
+                <h1 className="hero-title text-black dark:text-white mb-6 sm:mb-8 md:mb-10 tracking-tight animate-slide-up">
+                  No Proposals Available
+                </h1>
+                <p className="hero-subtitle text-black/60 dark:text-white/60 mb-8 sm:mb-10 md:mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                  There are no proposals in the system yet. Milestones can only be added to passed proposals.
+                </p>
+                <Link
+                  href="/proposals"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#2563EB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#1E3A8A] text-white font-bold py-3 sm:py-4 md:py-5 px-8 sm:px-10 md:px-12 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-base sm:text-lg md:text-xl animate-fade-in"
+                  style={{ animationDelay: '300ms' }}
+                >
+                  View Proposals →
+                </Link>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          🎯 Milestone Tracker
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Manage and track project milestones for passed proposals.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="xl:col-span-2">
-          {selectedProposal ? (
-            <div className="space-y-6">
-              {/* Back Button */}
-              <button
-                onClick={() => setSelectedProposalId(null)}
-                className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
-              >
-                ← Back to proposal list
-              </button>
-
-              {/* Proposal Details */}
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                      Proposal #{selectedProposal.id.toString()}
-                    </h2>
-                    <span className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      {getProposalStatusText(selectedProposal.status)}
-                    </span>
-                  </div>
-                  <div className="text-right text-sm text-gray-600 dark:text-gray-400">
-                    <p className="font-medium">Total Funds: {weiToEth(selectedProposal.fundsEscrowed)} ETH</p>
-                    <p>Milestones: {selectedProposal.milestoneCount.toString()}</p>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-2">Description:</h3>
-                  <p className="text-gray-700 dark:text-gray-300">{selectedProposal.description}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">Created:</span>
-                    <p className="text-gray-900 dark:text-white">{formatTimestamp(selectedProposal.creationTime)}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-600 dark:text-gray-400">Contractor:</span>
-                    <p className="text-gray-900 dark:text-white font-mono text-xs">
-                      {selectedProposal.contractAddress}
-                    </p>
-                  </div>
-                </div>
+    <div className="w-full min-h-screen bg-gradient-to-b from-white via-white to-[#F8F9FA] dark:from-black dark:via-black dark:to-[#0F0F0F]">
+      {/* Hero Section - Fluid Width */}
+      <section className="relative w-full overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-30"></div>
+        
+        <div className="relative w-full hero-section">
+          <div className="w-full hero-content">
+            <div className="text-center w-full">
+              <div className="inline-flex items-center justify-center hero-icon animate-scale-in backdrop-blur-sm">
+                <span className="hero-icon-emoji">🎯</span>
               </div>
-
-              {/* Milestone Manager */}
-              <MilestoneManager 
-                proposalId={Number(selectedProposal.id)}
-                onMilestoneAdded={handleMilestoneUpdate}
-              />
-
-              {/* Existing Milestones Display */}
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Project Milestones
-                </h3>
-                
-                {Number(selectedProposal.milestoneCount) === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-4xl mb-4">📝</div>
-                    <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                      No Milestones Yet
-                    </h4>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Add milestones to break down this project into manageable phases.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {/* Note: In a real implementation, you'd fetch and display actual milestone data */}
-                    <div className="text-center py-8 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <div className="text-4xl mb-4">🚧</div>
-                      <h4 className="text-lg font-medium text-blue-900 dark:text-blue-100 mb-2">
-                        Milestone Display Coming Soon
-                      </h4>
-                      <p className="text-blue-700 dark:text-blue-200">
-                        Individual milestone details will be displayed here. 
-                        Currently showing {selectedProposal.milestoneCount.toString()} milestone(s).
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Select a Proposal to Manage Milestones
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Choose from the passed proposals below to add and manage milestones.
+              <h1 className="hero-title text-black dark:text-white mb-6 sm:mb-8 md:mb-10 tracking-tight animate-slide-up">
+                Milestone Tracker
+              </h1>
+              <p className="hero-subtitle text-black/60 dark:text-white/60 mb-8 sm:mb-10 md:mb-12 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                Manage and track project milestones for passed proposals.
               </p>
-              
-              <div className="space-y-4">
-                {passedProposals.map(proposal => (
-                  <div 
-                    key={proposal.id.toString()}
-                    className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => setSelectedProposalId(Number(proposal.id))}
-                  >
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                          Proposal #{proposal.id.toString()}
-                        </h3>
-                        <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                          {getProposalStatusText(proposal.status)}
-                        </span>
-                      </div>
-                      <div className="text-right text-sm text-gray-600 dark:text-gray-400">
-                        <p>Funds: {weiToEth(proposal.fundsEscrowed)} ETH</p>
-                        <p>Milestones: {proposal.milestoneCount.toString()}</p>
-                      </div>
-                    </div>
-                    
-                    <p className="text-gray-700 dark:text-gray-300 line-clamp-2 mb-3">
-                      {proposal.description}
-                    </p>
-                    
-                    <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
-                      <span>Created: {formatTimestamp(proposal.creationTime)}</span>
-                      <span className="text-blue-600 dark:text-blue-400 hover:underline">
-                        Manage Milestones →
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Quick Stats */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Milestone Statistics
-            </h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-400">Passed Proposals:</span>
-                <span className="font-medium text-gray-900 dark:text-white">
-                  {passedProposals.length}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-400">Total Milestones:</span>
-                <span className="font-medium text-gray-900 dark:text-white">
-                  {passedProposals.reduce((sum, p) => sum + Number(p.milestoneCount), 0)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 dark:text-gray-400">Total Funds:</span>
-                <span className="font-medium text-gray-900 dark:text-white">
-                  {passedProposals.reduce((sum, p) => sum + parseFloat(weiToEth(p.fundsEscrowed)), 0).toFixed(2)} ETH
-                </span>
-              </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Available Proposals */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Available Proposals
-            </h3>
-            <div className="space-y-2">
-              {passedProposals.map(proposal => (
+      {selectedProposalId ? (
+        <section className="w-full section-container">
+          <div className="w-full section-content">
+            <div className="w-full space-y-6 sm:space-y-8 md:space-y-10" style={{ maxWidth: 'min(95%, 1200px)' }}>
+              <div className="text-center">
                 <button
-                  key={proposal.id.toString()}
-                  onClick={() => setSelectedProposalId(Number(proposal.id))}
-                  className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                    selectedProposalId === Number(proposal.id)
-                      ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
-                      : "border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  }`}
+                  onClick={() => setSelectedProposalId(null)}
+                  className="text-[#2563EB] dark:text-[#3B82F6] hover:underline font-bold text-base sm:text-lg transition-colors"
                 >
-                  <div className="font-medium text-gray-900 dark:text-white">
-                    Proposal #{proposal.id.toString()}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {proposal.milestoneCount.toString()} milestone(s)
-                  </div>
+                  ← Back to proposal list
                 </button>
+              </div>
+              
+              <ProposalItem proposalId={selectedProposalId} showVoteButton={false} />
+              
+              <MilestoneManager 
+                proposalId={selectedProposalId}
+                onMilestoneAdded={() => {}}
+              />
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="w-full section-container">
+          <div className="w-full section-content">
+            <h2 className="feature-title text-black dark:text-white mb-8 sm:mb-10 md:mb-12 text-center animate-fade-in">
+              Select a Proposal to Manage Milestones
+            </h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12">
+              {proposalIds.map((id, index) => (
+                <div 
+                  key={id}
+                  className="animate-fade-in cursor-pointer" 
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                  onClick={() => setSelectedProposalId(id)}
+                >
+                  <ProposalItem 
+                    proposalId={id}
+                    showVoteButton={false}
+                  />
+                </div>
               ))}
             </div>
           </div>
-
-          {/* Guidelines */}
-          <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-4">
-              Milestone Guidelines
-            </h3>
-            <div className="space-y-3 text-sm text-purple-800 dark:text-purple-200">
-              <div className="flex items-start">
-                <span className="text-purple-600 dark:text-purple-400 mr-2">•</span>
-                <span>Break projects into logical phases</span>
-              </div>
-              <div className="flex items-start">
-                <span className="text-purple-600 dark:text-purple-400 mr-2">•</span>
-                <span>Set realistic target dates</span>
-              </div>
-              <div className="flex items-start">
-                <span className="text-purple-600 dark:text-purple-400 mr-2">•</span>
-                <span>Distribute funds across milestones</span>
-              </div>
-              <div className="flex items-start">
-                <span className="text-purple-600 dark:text-purple-400 mr-2">•</span>
-                <span>Mark completion to release funds</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        </section>
+      )}
     </div>
   );
 }

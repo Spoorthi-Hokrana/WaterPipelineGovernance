@@ -12,10 +12,6 @@
     "type-check": "tsc --noEmit",
     "build:analyze": "ANALYZE=true npm run build",
     "export": "next export",
-    "validate": "node scripts/validate-build.js",
-    "prebuild": "npm run validate",
-    "setup:env": "node scripts/setup-env.js",
-    "test:deployment": "node scripts/test-deployment.js",
     "deploy": "vercel --prod",
     "deploy:preview": "vercel",
     "deploy:test": "npm run deploy:preview && echo 'Run: npm run test:deployment https://your-preview-url.vercel.app'"

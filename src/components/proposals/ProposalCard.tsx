@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Proposal, getProposalStatusText, ProposalStatus } from "@/hooks/contract";
 import { weiToEth, formatTimestamp, getTimeRemaining, getVotingProgress } from "@/utils/contractUtils";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 interface ProposalCardProps {
   proposal: Proposal;
@@ -28,95 +27,107 @@ export function ProposalCard({ proposal, showVoteButton = true, isLoading = fals
   const getStatusColor = (status: ProposalStatus) => {
     switch (status) {
       case ProposalStatus.Active:
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+        return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 dark:border-blue-500/30";
       case ProposalStatus.Passed:
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+        return "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 dark:border-green-500/30";
       case ProposalStatus.Failed:
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+        return "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20 dark:border-red-500/30";
       case ProposalStatus.Executed:
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
+        return "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 dark:border-purple-500/30";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
+        return "bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20 dark:border-gray-500/30";
     }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 space-y-2 sm:space-y-0">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Proposal #{proposal.id.toString()}
-          </h3>
-          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(proposal.status)}`}>
+    <div className="group card-premium p-8 hover:shadow-2xl transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
+      {/* Header with Premium Styling */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 gap-4">
+        <div className="flex-1 space-y-3">
+          <div className="flex items-center gap-3">
+            <h3 className="text-xl font-bold text-black dark:text-white tracking-tight group-hover:text-[#2563EB] dark:group-hover:text-[#3B82F6] transition-colors duration-200">
+              Proposal #{proposal.id.toString()}
+            </h3>
+            {isActive && (
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              </span>
+            )}
+          </div>
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${getStatusColor(proposal.status)} transition-colors duration-200`}>
             {getProposalStatusText(proposal.status)}
           </span>
         </div>
-        <div className="text-left sm:text-right text-sm text-gray-600 dark:text-gray-400 space-y-1">
-          <p className="font-medium">💰 {weiToEth(proposal.fundsEscrowed)} ETH</p>
-          <p>🎯 {proposal.milestoneCount.toString()} milestones</p>
+        <div className="text-left sm:text-right space-y-2">
+          <p className="text-base font-semibold text-black dark:text-white">
+            💰 {weiToEth(proposal.fundsEscrowed)} ETH
+          </p>
+          <p className="text-sm text-black/60 dark:text-white/60 font-medium">
+            🎯 {proposal.milestoneCount.toString()} milestones
+          </p>
         </div>
       </div>
 
-      {/* Description */}
-      <div className="mb-4">
-        <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base line-clamp-3 leading-relaxed">
+      {/* Description with Hover Underline Effect */}
+      <div className="mb-6">
+        <p className="text-base text-black/70 dark:text-white/70 line-clamp-3 leading-relaxed font-medium">
           {proposal.description}
         </p>
       </div>
 
-      {/* Voting Progress */}
-      <div className="mb-4">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 space-y-1 sm:space-y-0">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      {/* Voting Progress with Smooth Animation */}
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
+          <span className="text-sm font-semibold text-black dark:text-white">
             Voting Progress
           </span>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-sm text-black/60 dark:text-white/60 font-medium">
             {totalVotes.toString()} total votes
           </span>
         </div>
         
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-2 overflow-hidden">
-          <div className="flex h-full">
+        <div className="w-full bg-black/5 dark:bg-white/5 rounded-full h-2.5 mb-3 overflow-hidden backdrop-blur-sm">
+          <div className="flex h-full rounded-full overflow-hidden">
             <div
-              className="bg-green-500 transition-all duration-300 ease-out"
+              className="bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{ width: `${yesPercentage}%` }}
             ></div>
             <div
-              className="bg-red-500 transition-all duration-300 ease-out"
+              className="bg-gradient-to-r from-red-500 to-red-600 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{ width: `${noPercentage}%` }}
             ></div>
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row sm:justify-between text-xs sm:text-sm space-y-1 sm:space-y-0">
-          <span className="text-green-600 dark:text-green-400 font-medium">
+        <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2">
+          <span className="text-green-600 dark:text-green-400 font-semibold">
             ✅ Yes: {proposal.yesVotes.toString()} ({yesPercentage}%)
           </span>
-          <span className="text-red-600 dark:text-red-400 font-medium">
+          <span className="text-red-600 dark:text-red-400 font-semibold">
             ❌ No: {proposal.noVotes.toString()} ({noPercentage}%)
           </span>
         </div>
       </div>
 
       {/* Timeline */}
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-          <div>
-            <span className="font-medium">📅 Created:</span>
-            <p className="truncate">{formatTimestamp(proposal.creationTime)}</p>
+      <div className="mb-6 text-sm space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <span className="font-semibold text-black/60 dark:text-white/60">📅 Created:</span>
+            <p className="text-black dark:text-white font-medium">{formatTimestamp(proposal.creationTime)}</p>
           </div>
-          <div>
-            <span className="font-medium">⏰ Deadline:</span>
-            <p className="truncate">{formatTimestamp(proposal.votingDeadline)}</p>
+          <div className="space-y-1">
+            <span className="font-semibold text-black/60 dark:text-white/60">⏰ Deadline:</span>
+            <p className="text-black dark:text-white font-medium">{formatTimestamp(proposal.votingDeadline)}</p>
           </div>
         </div>
         
         {isActive && (
-          <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-200 dark:border-yellow-800">
-            <div className="flex items-center space-x-2">
-              <span className="font-medium">⏳ Time Remaining:</span>
-              <span className={`font-bold ${hasEnded ? "text-red-600 dark:text-red-400" : "text-orange-600 dark:text-orange-400"}`}>
+          <div className="p-3 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-xl border border-yellow-500/20 dark:border-yellow-500/30 backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-yellow-700 dark:text-yellow-400">⏳ Time Remaining:</span>
+              <span className={`font-bold ${hasEnded ? "text-red-600 dark:text-red-400" : "text-yellow-600 dark:text-yellow-400"}`}>
                 {timeRemaining}
               </span>
             </div>
@@ -124,20 +135,23 @@ export function ProposalCard({ proposal, showVoteButton = true, isLoading = fals
         )}
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      {/* Actions with Premium Buttons */}
+      <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-black/5 dark:border-white/5">
         {showVoteButton && isActive && !hasEnded && (
           <Link
             href={`/voting?proposal=${proposal.id}`}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-md transition-all duration-200 font-medium shadow-sm hover:shadow-md"
+            className="group/btn flex-1 btn-premium bg-gradient-to-r from-[#2563EB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#1E3A8A] text-white text-center py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
           >
-            🗳️ Vote Now
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              🗳️ Vote Now
+              <span className="group-hover/btn:translate-x-1 transition-transform duration-200">→</span>
+            </span>
           </Link>
         )}
         
         <Link
           href={`/proposals/${proposal.id}`}
-          className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-center py-2 px-4 rounded-md transition-all duration-200 font-medium"
+          className="flex-1 btn-premium border-2 border-black/10 dark:border-white/10 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 text-center py-3 px-6 rounded-xl font-semibold transition-all duration-200 hover:border-black/20 dark:hover:border-white/20"
         >
           👀 View Details
         </Link>
@@ -148,35 +162,40 @@ export function ProposalCard({ proposal, showVoteButton = true, isLoading = fals
 
 export function ProposalCardSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 animate-pulse">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 space-y-2 sm:space-y-0">
-        <div className="flex-1">
-          <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-32 mb-2"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+    <div className="card-premium p-8">
+      <div className="space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex justify-between items-start">
+          <div className="space-y-3 flex-1">
+            <div className="skeleton h-6 w-32 rounded-lg"></div>
+            <div className="skeleton h-5 w-20 rounded-full"></div>
+          </div>
+          <div className="space-y-2">
+            <div className="skeleton h-5 w-24 rounded"></div>
+            <div className="skeleton h-4 w-20 rounded"></div>
+          </div>
         </div>
-        <div className="space-y-1">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+        
+        {/* Description Skeleton */}
+        <div className="space-y-2">
+          <div className="skeleton h-4 w-full rounded"></div>
+          <div className="skeleton h-4 w-3/4 rounded"></div>
         </div>
-      </div>
-      
-      <div className="space-y-2 mb-4">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-      </div>
-      
-      <div className="mb-4">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-2"></div>
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-        <div className="flex justify-between">
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+        
+        {/* Progress Skeleton */}
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <div className="skeleton h-4 w-32 rounded"></div>
+            <div className="skeleton h-4 w-20 rounded"></div>
+          </div>
+          <div className="skeleton h-2.5 w-full rounded-full"></div>
         </div>
-      </div>
-      
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded flex-1"></div>
-        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded flex-1"></div>
+        
+        {/* Actions Skeleton */}
+        <div className="flex gap-3 pt-4 border-t border-black/5 dark:border-white/5">
+          <div className="skeleton h-12 flex-1 rounded-xl"></div>
+          <div className="skeleton h-12 flex-1 rounded-xl"></div>
+        </div>
       </div>
     </div>
   );
